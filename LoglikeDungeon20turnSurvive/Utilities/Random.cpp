@@ -6,7 +6,7 @@ std::mt19937 Random::s_Gen(Random::s_Rd());
 
 int Random::Range(int p_Min, int p_Max)
 {
-    // uniform_int_distribution은 [min, max] 범위를 포함합니다.
+    // uniform_int_distribution은 최소, 최대 범위를 포함합니다.
     std::uniform_int_distribution<int> dist(p_Min, p_Max);
     return dist(s_Gen);
 }

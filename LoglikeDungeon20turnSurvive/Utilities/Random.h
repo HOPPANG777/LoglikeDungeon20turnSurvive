@@ -4,7 +4,7 @@
 class Random
 {
 public:
-    // 어디서든 Random::Range(...)로 호출 가능
+    // 어디서든 호출 가능
     static int Range(int p_Min, int p_Max);
     static float Range(float p_Min, float p_Max);
 

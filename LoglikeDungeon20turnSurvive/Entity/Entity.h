@@ -10,23 +10,22 @@ protected:
 	// 엔티티 이름
 	std::string _name = {};
 
-	// 엔티티의 사망 확인
+	// 죽었는지 판단
 	bool _isDead = false;
 
-	// 엔티티 체력
-	int _health = 0;
+	// 체력
 	int _maxHealth = 0;
 	int _currentHealth = 0;
 
-	// 엔티티 공격력과 방어력
+	// 기본 스탯
 	int _attack = 0;
 	int _defense = 0;
 
 public:
-	// 기본 생성자(이름만으로 생성)
+	// 기본 생성자
 	Entity(const std::string& name);
 	
-	// 이름 및 기본 스탯 정의 생성자.
+	// 생성자 
 	Entity(const std::string& name, int health, int attack, int defense);
 	
 public:
@@ -53,7 +52,7 @@ public:
 	}
 
 public:
-	// 기본 소멸자 사용
+	// 기본 소멸자
 	virtual ~Entity() = default;
 
 public:
@@ -61,13 +60,17 @@ public:
 	virtual void Render(); 
 
 public:
-	// 기본적으로 피해를 '받는'다 라고 설정
+	// 데미지를 받는 함수
 	void TakeDamage(int damage);
 
-	// 엔티티 사망 함수
-	virtual void Dead();
+	// 공격 하는 함수
+	void Attack(Entity& defender);
 
-	//
+	// 상대방 공격으로 전환
+	bool ExchangeCombat(Entity& other);
+
+	// 사망 함수
+	virtual void Dead();
 
 public:
 	bool IsDead() const { return _isDead; }
@@ -78,4 +81,3 @@ public:
 	const std::string& GetName() const { return _name; }
 
 };
-

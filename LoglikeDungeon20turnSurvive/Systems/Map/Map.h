@@ -3,8 +3,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "Entity/Player/Player.h"
-#include "Systems/Input/Input.h"
 #include "Type/Tile.h"
 #include "Type/Position.h"
 
@@ -40,7 +38,6 @@ public:
 	void SetTile(const Position& p, Tile t);
 
 public:
-	const std::vector<Tile>& Raw() const { return _map; } // 디버그/출력용(선택)
+	const std::vector<Tile>& Raw() const { return _map; }
 
 };
-

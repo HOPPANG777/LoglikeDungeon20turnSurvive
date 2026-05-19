@@ -1,10 +1,12 @@
-ï»¿
+
 #include "Game.h"
+#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
 Game::Game()
-	: _player("Player", 30, 4, 1, 5)
+	: _player("Player", 30, 4, 1)
 {
 }
 
@@ -12,33 +14,91 @@ void Game::Init()
 {
 	_map.MapInit();
 
-	// í”Œë ˆì´ì–´ ì‹œì‘ ìœ„ì¹˜: ë²½ì´ ì•„ë‹Œ ê³³
+	// ÇÃ·¹ÀÌ¾î ½ÃÀÛ À§Ä¡ -> º®ÀÌ ¾Æ´Ñ °÷
 	_player.SetPosition(1, 1);
 
-	// ëª¬ìŠ¤í„° ì‹œì‘ ìœ„ì¹˜: ë²½ì´ ì•„ë‹Œ ê³³
+	// °ÔÀÓ »óÅÂ ÃÊ±âÈ­
+	_monsters.clear();
+	_monsterPosition.clear();
+	_items.clear();
+	_bossSpawned = false;
+	_wonByBoss = false;
+	_state = GameState::GAME_STATE_PLAYING;
+	_turn = 1;
+	_running = true;
+	_endMessage.clear();
+
+	// ¸ó½ºÅÍ ½ÃÀÛ À§Ä¡ -> º®ÀÌ ¾Æ´Ñ °÷
 	MonsterSpawn(3);
 
+	// ¾ÆÀÌÅÛ 3°³ ¹èÄ¡
+	ItemSpawn(3);
+
 	_log.clear();
-	for (const auto& _m : _monsters) AddLog("Monster Spawn : " + to_string(_m.GetPosition().x) + ", " + to_string(_m.GetPosition().y));
+	for (const auto& m : _monsters)
+		AddLog("Monster Spawn : " + to_string(m.GetPosition().x) + ", " + to_string(m.GetPosition().y));
 	AddLog("Game Start!");
 }
 
 void Game::Run()
 {
-	while (_running)
+	// Ãâ·Â ¡æ ÀÔ·Â ¡æ ¸ó½ºÅÍ ¡æ ÅÏ Áõ°¡ ¡æ ½ÂÆĞ
+	while (_running && _state == GameState::GAME_STATE_PLAYING)
 	{
+		// ¸Ê + »óÅÂ Ãâ·Â
 		Render();
 
 		cout << "\n> ";
 		cout.flush();
 
+		// ÇÃ·¹ÀÌ¾î ÀÔ·Â Ã³¸®
 		Action a = _input.ReadInput();
+
+		// Á¾·á´Â ÅÏÀ» ¼Ò¸ğÇÏÁö ¾ÊÀ½
+		if (a == Action::ACTION_QUIT)
+		{
+			_running = false;
+			AddLog("Quit.");
+			break;
+		}
+
 		HandlePlayerAction(a);
 
-		// ì§€ê¸ˆ ë‹¨ê³„ì—ì„œëŠ” ëª¬ìŠ¤í„°/í„´ ê·œì¹™ ì•„ì§ ì•ˆ ë¶™ì„.
-		// ì¼ë‹¨ â€œì…ë ¥ â†’ ì´ë™ â†’ í™”ë©´ ê°±ì‹ â€ì´ ëª©ì .
-		if (_running)
-			++_turn;
+		// º¸½º Ã³Ä¡ µîÀ¸·Î ÀÌ¹Ì ½Â¸®ÇÑ °æ¿ì
+		if (_state != GameState::GAME_STATE_PLAYING)
+			break;
+
+		// ÇÃ·¹ÀÌ¾î »ç¸Á ½Ã ÆĞ¹è
+		if (_player.IsDead())
+		{
+			SetDefeat();
+			break;
+		}
+
+		// ¸ó½ºÅÍ ÀÌµ¿ + Á¢ÃË ÀüÅõ
+		UpdateMonsters();
+		RemoveDeadMonsters();
+
+		if (_player.IsDead())
+		{
+			SetDefeat();
+			break;
+		}
+
+		// ÅÏ Áõ°¡, 20ÅÏ º¸½º µîÀå
+		EndTurn();
+
+		// ½ÂÆĞ ÆÇÁ¤
+		if (CheckEndCondition())
+			break;
+	}
+
+	// Á¾·á È­¸é
+	if (_state == GameState::GAME_STATE_WON || _state == GameState::GAME_STATE_LOST)
+	{
+		RenderEndScreen();
+		string dummy;
+		getline(cin, dummy);
 	}
 }
 
@@ -46,23 +106,24 @@ void Game::HandlePlayerAction(Action a)
 {
 	switch (a)
 	{
-	case Action::MoveUp:    TryMovePlayer(0, -1); break;
-	case Action::MoveDown:  TryMovePlayer(0, 1); break;
-	case Action::MoveLeft:  TryMovePlayer(-1, 0); break;
-	case Action::MoveRight: TryMovePlayer(1, 0); break;
+	case Action::ACTION_MOVE_UP:    TryMovePlayer(0, -1); break;
+	case Action::ACTION_MOVE_DOWN:  TryMovePlayer(0, 1); break;
+	case Action::ACTION_MOVE_LEFT:  TryMovePlayer(-1, 0); break;
+	case Action::ACTION_MOVE_RIGHT: TryMovePlayer(1, 0); break;
 
-	case Action::Interact:
-		AddLog("Interact (not implemented yet).");
+	case Action::ACTION_INTERACT:
+		// E -> °°Àº Ä­ ¾ÆÀÌÅÛ Áİ±â, ¾øÀ¸¸é Æ÷¼Ç »ç¿ë
+		if (!TryPickupItem())
+			TryUsePotion();
 		break;
 
-	case Action::Quit:
-		_running = false;
-		AddLog("Quit.");
+	case Action::ACTION_USE_POTION:
+		TryUsePotion();
 		break;
 
-	case Action::None:
+	case Action::ACTION_NONE:
 	default:
-		AddLog("No action.");
+		AddLog("Àß¸øµÈ ÀÔ·ÂÀÔ´Ï´Ù.");
 		break;
 	}
 }
@@ -72,59 +133,331 @@ void Game::TryMovePlayer(int dx, int dy)
 	Position cur = _player.GetPosition();
 	Position next{ cur.x + dx, cur.y + dy };
 
-	if (!_map.IsInside(next))
-	{
-		AddLog("Blocked: outside map.");
-		return;
-	}
-
-	if (_map.GetTile(next) == Tile::TILE_WALL)
-	{
-		AddLog("Blocked: wall.");
-		return;
-	}
-
+	// ÀÌµ¿ÇÏ·Á´Â Ä­¿¡ ¸ó½ºÅÍ°¡ ÀÖÀ¸¸é ÀüÅõ (Game ÆÇÁ¤)
 	int idx = FindMonsterIndexAt(next);
 
 	if (idx != -1)
 	{
-		while (!_player.IsDead() && !_monsters[idx].IsDead())
-		{
-			Combat(_player, _monsters[idx]);
-		}
+		CombatWithMonster(idx);
 
 		if (_player.IsDead())
 		{
-			HandlePlayerAction(Action::Quit);
+			SetDefeat();
+			return;
 		}
 
-		{
-			AddLog(_monsters[idx].GetName() + "ê°€ ì‚¬ë§í–ˆìŠµë‹ˆë‹¤.");
+		if (idx < static_cast<int>(_monsters.size()) && _monsters[idx].IsDead())
+			OnMonsterKilled(idx);
 
-			Position deadPos = _monsters[idx].GetPosition();
-
-			_monsterPosition.erase(deadPos);
-
-			_monsters.erase(_monsters.begin() + idx);
-
-			return; // ì—¬ê¸°ì„œ ë
-		}
-		
+		return;
 	}
 
-	_player.SetPosition(next.x, next.y);
-	AddLog("Player moved.");
+	switch (_player.TryMove(_map, dx, dy))
+	{
+	case PlayerMoveResult::BlockedOutside:
+		AddLog("Blocked: outside map.");
+		break;
+	case PlayerMoveResult::BlockedWall:
+		AddLog("Blocked: wall.");
+		break;
+	case PlayerMoveResult::Moved:
+		AddLog("Player moved.");
+		break;
+	}
+}
+
+void Game::PerformExchangeCombat(Entity& attacker, Entity& defender)
+{
+	attacker.Attack(defender);
+	AddLog(defender.GetName() + "°¡ " + to_string(attacker.GetATK()) + "¸¸Å­ µ¥¹ÌÁö¸¦ ÀÔ¾ú½À´Ï´Ù.");
+
+	if (!defender.IsDead())
+	{
+		defender.Attack(attacker);
+		AddLog(attacker.GetName() + "°¡ " + to_string(defender.GetATK()) + "¸¸Å­ µ¥¹ÌÁö¸¦ ÀÔ¾ú½À´Ï´Ù.");
+	}
+}
+
+void Game::CombatWithMonster(int monsterIndex)
+{
+	// ÇÑ ÅÏ¿¡ 1È¸ ±³È¯ -> µÑ Áß ÇÏ³ª°¡ Á×À» ¶§±îÁö ¹İº¹
+	while (!_player.IsDead() && monsterIndex < static_cast<int>(_monsters.size())
+		&& !_monsters[monsterIndex].IsDead())
+	{
+		PerformExchangeCombat(_player, _monsters[monsterIndex]);
+	}
+}
+
+void Game::OnMonsterKilled(int monsterIndex)
+{
+	if (monsterIndex < 0 || monsterIndex >= static_cast<int>(_monsters.size()))
+		return;
+
+	AddLog(_monsters[monsterIndex].GetName() + "°¡ »ç¸ÁÇß½À´Ï´Ù.");
+
+	Position deadPos = _monsters[monsterIndex].GetPosition();
+
+	if (_monsters[monsterIndex].IsBoss())
+		SetVictory(true);
+
+	_monsterPosition.erase(deadPos);
+	_monsters.erase(_monsters.begin() + monsterIndex);
+}
+
+void Game::UpdateMonsters()
+{
+	for (size_t i = 0; i < _monsters.size(); ++i)
+	{
+		if (_monsters[i].IsDead())
+			continue;
+
+		TryMoveMonster(_monsters[i]);
+
+		if (_player.IsDead())
+			return;
+
+		Position mPos = _monsters[i].GetPosition();
+		Position pPos = _player.GetPosition();
+
+		if (mPos == pPos)
+		{
+			AddLog(_monsters[i].GetName() + "ÀÇ °ø°İ!");
+			CombatWithMonster(static_cast<int>(i));
+		}
+	}
+
+	SyncMonsterPositions();
+}
+
+void Game::TryMoveMonster(Monster& monster)
+{
+	ChaseStep step = monster.CalcChaseStep(_player.GetPosition());
+	if (!step.shouldMove)
+		return;
+
+	Position cur = monster.GetPosition();
+	Position next{ cur.x + step.stepX, cur.y + step.stepY };
+
+	if (!_map.IsInside(next))
+		return;
+
+	if (_map.GetTile(next) == Tile::TILE_WALL)
+		return;
+
+	if (next == _player.GetPosition())
+	{
+		_monsterPosition.erase(cur);
+		monster.ApplyMove(step.stepX, step.stepY);
+		_monsterPosition.insert(monster.GetPosition());
+		return;
+	}
+
+	int selfIdx = -1;
+	for (size_t i = 0; i < _monsters.size(); ++i)
+	{
+		if (&_monsters[i] == &monster)
+		{
+			selfIdx = static_cast<int>(i);
+			break;
+		}
+	}
+
+	if (IsOccupiedByMonster(next, selfIdx))
+		return;
+
+	_monsterPosition.erase(cur);
+	monster.ApplyMove(step.stepX, step.stepY);
+	_monsterPosition.insert(monster.GetPosition());
+}
+
+bool Game::IsOccupiedByMonster(Position pos, int skipIndex) const
+{
+	for (size_t i = 0; i < _monsters.size(); ++i)
+	{
+		if (static_cast<int>(i) == skipIndex) continue;
+
+		if (!_monsters[i].IsDead() && _monsters[i].GetPosition() == pos) return true;
+	}
+	return false;
+}
+
+void Game::SyncMonsterPositions()
+{
+	_monsterPosition.clear();
+	for (const auto& m : _monsters)
+	{
+		if (!m.IsDead()) _monsterPosition.insert(m.GetPosition());
+	}
+}
+
+void Game::RemoveDeadMonsters()
+{
+	for (int i = static_cast<int>(_monsters.size()) - 1; i >= 0; --i)
+	{
+		if (_monsters[i].IsDead())
+		{
+			if (_monsters[i].IsBoss()) SetVictory(true);
+
+			_monsterPosition.erase(_monsters[i].GetPosition());
+			_monsters.erase(_monsters.begin() + i);
+		}
+	}
+}
+
+void Game::EndTurn()
+{
+	++_turn;
+
+	if (_turn >= kSurvivalTurns && !_bossSpawned) SpawnBoss();
+}
+
+void Game::SpawnBoss()
+{
+	if (_bossSpawned)
+		return;
+
+	for (int attempt = 0; attempt < 200; ++attempt)
+	{
+		int x = Random::Range(0, Map::width - 1);
+		int y = Random::Range(0, Map::height - 1);
+		Position pos{ x, y };
+
+		if (_map.GetTile(pos) == Tile::TILE_WALL) continue;
+
+		Position p = _player.GetPosition();
+		if (pos == p) continue;
+
+		if (IsOccupiedByMonster(pos)) continue;
+
+		if (HasItemAt(pos)) continue;
+
+		Monster boss("Boss", 25, 3, 2, true);
+		boss.SetPosition(x, y);
+		_monsters.push_back(boss);
+		_monsterPosition.insert(pos);
+		_bossSpawned = true;
+		AddLog("º¸½º°¡ µîÀåÇß½À´Ï´Ù!");
+		return;
+	}
+
+	AddLog("º¸½º ½ºÆù ½ÇÆĞ (ºó Ä­ ¾øÀ½).");
+}
+
+void Game::ItemSpawn(int count)
+{
+	int placed = 0;
+	int attempts = 0;
+
+	while (placed < count && attempts < 500)
+	{
+		++attempts;
+		int x = Random::Range(0, Map::width - 1);
+		int y = Random::Range(0, Map::height - 1);
+		Position pos{ x, y };
+
+		if (_map.GetTile(pos) != Tile::TILE_EMPTY) continue;
+
+		if (_player.GetPosition() == pos) continue;
+
+		if (HasItemAt(pos)) continue;
+
+		_items.push_back(pos);
+		_map.SetTile(pos, Tile::TILE_ITEM);
+		++placed;
+	}
+}
+
+bool Game::HasItemAt(Position pos) const
+{
+	return _map.GetTile(pos) == Tile::TILE_ITEM;
+}
+
+void Game::RemoveItemAt(Position pos)
+{
+	_map.SetTile(pos, Tile::TILE_EMPTY);
+	_items.erase(remove(_items.begin(), _items.end(), pos), _items.end());
+}
+
+bool Game::TryPickupItem()
+{
+	Position p = _player.GetPosition();
+
+	if (!HasItemAt(p))
+	{
+		AddLog("ÁİÀ» ¾ÆÀÌÅÛÀÌ ¾ø½À´Ï´Ù.");
+		return false;
+	}
+
+	if (!_player.TryPickupItem(_map))
+		return false;
+
+	_items.erase(remove(_items.begin(), _items.end(), p), _items.end());
+	AddLog("Æ÷¼ÇÀ» È¹µæÇß½À´Ï´Ù.");
+	return true;
+}
+
+void Game::TryUsePotion()
+{
+	if (_player.TryUsePotion())
+		AddLog("Æ÷¼ÇÀ» »ç¿ëÇß½À´Ï´Ù. HP È¸º¹.");
+	else if (_player.GetPotionCount() <= 0)
+		AddLog("Æ÷¼ÇÀÌ ¾ø½À´Ï´Ù.");
+	else
+		AddLog("ÇöÀç Ã¼·ÂÀÌ ÃÖ´ë Ã¼·Â°ú µ¿ÀÏÇÕ´Ï´Ù.");
+}
+
+bool Game::CheckEndCondition()
+{
+	if (_player.IsDead())
+	{
+		SetDefeat();
+		return true;
+	}
+
+	if (_state == GameState::GAME_STATE_WON)
+		return true;
+
+	if (_turn >= kSurvivalTurns && !_player.IsDead())
+	{
+		SetVictory(false);
+		return true;
+	}
+
+	return _state != GameState::GAME_STATE_PLAYING;
+}
+
+void Game::SetVictory(bool byBoss)
+{
+	_state = GameState::GAME_STATE_WON;
+	_wonByBoss = byBoss;
+	_running = false;
+
+	if (byBoss)
+		_endMessage = "½Â¸®! º¸½º¸¦ Ã³Ä¡Çß½À´Ï´Ù.";
+	else
+		_endMessage = "½Â¸®! 20ÅÏÀ» »ıÁ¸Çß½À´Ï´Ù.";
+
+	AddLog(_endMessage);
+}
+
+void Game::SetDefeat()
+{
+	_state = GameState::GAME_STATE_LOST;
+	_running = false;
+	_endMessage = "ÆĞ¹è! HP°¡ 0ÀÌ µÇ¾ú½À´Ï´Ù.";
+	AddLog(_endMessage);
 }
 
 void Game::MonsterSpawn(const int count)
 {
-	// ëª¬ìŠ¤í„°ë¥¼ countë§Œí¼ ìƒì„±í•©ë‹ˆë‹¤.
 	for (int i = 0; i < count; i++)
 	{
-		while (true)
+		for (int attempt = 0; attempt < 200; ++attempt)
 		{
 			int x = Random::Range(0, Map::width - 1);
 			int y = Random::Range(0, Map::height - 1);
+
+			Position pos{ x, y };
 
 			Tile tile = _map.GetTile(x, y);
 
@@ -135,27 +468,16 @@ void Game::MonsterSpawn(const int count)
 
 			if (x == playerX && y == playerY) continue;
 
-			bool overlap = false;
+			if (IsOccupiedByMonster(pos)) continue;
 
-			for (size_t j = 0; j < _monsters.size(); j++)
-			{
-				if (_monsters[j].GetPosition().x == x &&
-					_monsters[j].GetPosition().y == y)
-				{
-					overlap = true;
-					continue;
-				}
-			}
+			if (HasItemAt(pos)) continue;
 
-			if (!overlap)
-			{
-				Monster monster("monster" + to_string(i), 8, 1, 1);
-				monster.SetPosition(x, y);
+			Monster monster("monster" + to_string(i), 8, 1, 1);
+			monster.SetPosition(x, y);
 
-				_monsters.push_back(monster);
-				_monsterPosition.insert(monster.GetPosition());
-				break;
-			}
+			_monsters.push_back(monster);
+			_monsterPosition.insert(pos);
+			break;
 		}
 	}
 }
@@ -170,13 +492,12 @@ Monster* Game::FindMonsterAt(int x, int y)
 		}
 	}
 
-
 	return nullptr;
 }
 
 int Game::FindMonsterIndexAt(Position pos)
 {
-	for (int i = 0; i < _monsters.size(); i++)
+	for (int i = 0; i < static_cast<int>(_monsters.size()); i++)
 	{
 		if (_monsters[i].GetPosition() == pos)
 		{
@@ -185,19 +506,6 @@ int Game::FindMonsterIndexAt(Position pos)
 	}
 
 	return -1;
-}
-
-void Game::Combat(Entity& attacker, Entity& defender)
-{
-	defender.TakeDamage(attacker.GetATK());
-	AddLog(defender.GetName() + "ê°€ " + to_string(attacker.GetATK()) + "ë§Œí¼ ë°ë¯¸ì§€ë¥¼ ì…ì—ˆìŠµë‹ˆë‹¤.");
-
-	if (!defender.IsDead())
-	{
-		attacker.TakeDamage(defender.GetATK());
-		AddLog(attacker.GetName() + "ê°€ " + to_string(defender.GetATK()) + "ë§Œí¼ ë°ë¯¸ì§€ë¥¼ ì…ì—ˆìŠµë‹ˆë‹¤.");
-	}
-
 }
 
 void Game::Render() const
@@ -212,13 +520,24 @@ void Game::Render() const
 	{
 		for (int x = 0; x < Map::width; ++x)
 		{
+			Position here{ x, y };
+
 			if (p.x == x && p.y == y)
 			{
 				cout << 'P';
 			}
-			else if (_monsterPosition.contains({ x,y }))
+			else if (_monsterPosition.contains(here))
 			{
-				cout << 'M';
+				const Monster* m = nullptr;
+				for (const auto& mon : _monsters)
+				{
+					if (!mon.IsDead() && mon.GetPosition() == here)
+					{
+						m = &mon;
+						break;
+					}
+				}
+				cout << (m && m->IsBoss() ? 'B' : 'M');
 			}
 			else
 			{
@@ -228,23 +547,36 @@ void Game::Render() const
 		cout << "\n";
 	}
 
-	bool hasMonster = false;
-
 	cout << "\n[Log]\n";
 	for (const auto& line : _log)
 		cout << "- " << line << "\n";
 
-	cout << "\nControls: W/A/S/D move, E interact, Q quit\n";
+	cout << "\nControls: W/A/S/D move, E interact, H potion, Q/ESC quit\n";
 }
 
 void Game::PlayerStatRender() const
 {
-	cout << "Turn: " << _turn << "\n";
+	cout << "Turn: " << _turn << " / " << kSurvivalTurns << "\n";
 	cout << "HP: " << _player.GetHP() << "/" << _player.GetMaxHP()
 		<< "  ATK: " << _player.GetATK()
 		<< "  DEF: " << _player.GetDEF()
 		<< "  Potions: " << _player.GetPotionCount()
 		<< "\n\n";
+}
+
+void Game::RenderEndScreen() const
+{
+	ClearScreen();
+	cout << "\n========================================\n";
+	if (_state == GameState::GAME_STATE_WON)
+		cout << "  ½Â¸®\n";
+	else
+		cout << "  ÆĞ¹è\n";
+	cout << "========================================\n\n";
+	cout << _endMessage << "\n\n";
+	cout << "ÃÖÁ¾ ÅÏ: " << _turn << "\n";
+	cout << "HP: " << _player.GetHP() << "/" << _player.GetMaxHP() << "\n\n";
+	cout << "Enter Å°¸¦ ´©¸£¸é Á¾·áÇÕ´Ï´Ù...\n";
 }
 
 void Game::AddLog(const string& msg)
@@ -256,7 +588,6 @@ void Game::AddLog(const string& msg)
 
 void Game::ClearScreen()
 {
-	// ANSI clear screen (ëŒ€ë¶€ë¶„ í„°ë¯¸ë„ì—ì„œ ë™ì‘)
 	cout << "\x1B[2J\x1B[H";
 }
 
@@ -265,6 +596,7 @@ char Game::TileToChar(Tile t)
 	switch (t)
 	{
 	case Tile::TILE_WALL:  return '#';
+	case Tile::TILE_ITEM:  return 'I';
 	case Tile::TILE_EMPTY: return '.';
 	default:          return '?';
 	}

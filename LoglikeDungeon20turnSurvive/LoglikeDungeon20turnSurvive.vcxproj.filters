@@ -67,6 +67,9 @@
     <ClInclude Include="Type\Tile.h">
       <Filter>Type</Filter>
     </ClInclude>
+    <ClInclude Include="Type\GameState.h">
+      <Filter>Type</Filter>
+    </ClInclude>
     <ClInclude Include="Systems\Map\Map.h">
       <Filter>Systems\Map</Filter>
     </ClInclude>

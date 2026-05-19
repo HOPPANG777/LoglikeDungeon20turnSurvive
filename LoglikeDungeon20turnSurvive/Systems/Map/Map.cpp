@@ -1,7 +1,7 @@
 #include "Map.h"
 
 Map::Map()
-    : _map(width* height, Tile::TILE_EMPTY) // 생성 시 100칸 고정
+    : _map(width * height, Tile::TILE_EMPTY)
 {
 }
 
@@ -17,7 +17,6 @@ bool Map::IsInside(const Position& p) const
 
 Tile Map::GetTile(int x, int y) const
 {
-    // 맵 밖은 TILE_WALL 취급(충돌 안전) - 원하면 assert/예외로 바꿔도 됨
     if (!IsInside(x, y)) return Tile::TILE_WALL;
     return _map[ToIndex(x, y)];
 }
@@ -29,7 +28,7 @@ Tile Map::GetTile(const Position& p) const
 
 void Map::SetTile(int x, int y, Tile t)
 {
-    if (!IsInside(x, y)) return; // 맵 밖 무시
+    if (!IsInside(x, y)) return;
     _map[ToIndex(x, y)] = t;
 }
 
@@ -40,23 +39,18 @@ void Map::SetTile(const Position& p, Tile t)
 
 void Map::MapInit()
 {
-    // 전체 TILE_EMPTY
     for (auto& cell : _map)
         cell = Tile::TILE_EMPTY;
 
-    // 테두리 TILE_WALL
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
         {
             const bool border = (x == 0 || x == width - 1 || y == 0 || y == height - 1);
-            if (border)
-                SetTile(x, y, Tile::TILE_WALL);
+            if (border) SetTile(x, y, Tile::TILE_WALL);
         }
     }
 
-    // 내부 고정 벽 몇 개(원하면 제거 가능)
-    // 막힘 방지 위해 간단히 몇 개만 추가
     SetTile(3, 3, Tile::TILE_WALL);
     SetTile(3, 4, Tile::TILE_WALL);
     SetTile(6, 6, Tile::TILE_WALL);

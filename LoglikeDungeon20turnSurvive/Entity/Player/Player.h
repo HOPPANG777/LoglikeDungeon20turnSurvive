@@ -6,19 +6,25 @@
 #include "Entity/Entity.h"
 #include "Type/Position.h"
 
+class Map;
+
+enum class PlayerMoveResult
+{
+	BlockedOutside,
+	BlockedWall,
+	Moved
+};
+
 class Player : public Entity
 {
 private:
 	Position _position{};
-	int _potionCount = 0; // 아이템은 "수량"으로만 처리한다.
-	int _maxPotion = 0;
-	int _potionUsed = 0;
+	int _potionCount = 0;
 
 public:
-	Player(std::string name, int health, int attack, int defense, int potion)
-		: Entity(name, health, attack, defense), _maxPotion(potion)
+	Player(std::string name, int health, int attack, int defense)
+		: Entity(name, health, attack, defense)
 	{
-
 	}
 
 	~Player() override = default;
@@ -35,12 +41,11 @@ public:
 
 public:
 	int GetPotionCount() const { return _potionCount; }
-	int GetMaxPotion() const { return _maxPotion; }
 	void AddPotion(int n = 1) { _potionCount += n; }
 
-public:
-	void TryMove(int directionX, int directionY);
-	void TryUsedPotion(int n = 1);
+	bool TryUsePotion();
 
+	PlayerMoveResult TryMove(const Map& map, int directionX, int directionY);
+
+	bool TryPickupItem(Map& map);
 };
-
