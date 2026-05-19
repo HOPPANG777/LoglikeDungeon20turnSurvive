@@ -1,6 +1,6 @@
-#pragma once
+О╩©#pragma once
 
-// ╟тюс ╩Себ
+// Й╡▄Л·└ Л┐│М┐°
 enum class GameState
 {
 	GAME_STATE_PLAYING, // 

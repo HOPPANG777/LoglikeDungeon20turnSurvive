@@ -21,6 +21,12 @@
     <ClCompile Include="Utilities\Random.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Entity\Boss\Boss.cpp">
+      <Filter>Entity\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Item\Item.cpp">
+      <Filter>Item</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entity">
@@ -49,6 +55,9 @@
     </Filter>
     <Filter Include="Utilities">
       <UniqueIdentifier>{c97e4474-580b-40df-a5ab-daba1753d816}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Item">
+      <UniqueIdentifier>{d6da5d30-2d60-4d01-848b-9ad918228cdc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +88,12 @@
     </ClInclude>
     <ClInclude Include="Utilities\Random.h">
       <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Boss\Boss.h">
+      <Filter>Entity\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Item\Item.h">
+      <Filter>Item</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

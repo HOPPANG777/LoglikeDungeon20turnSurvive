@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include <vector>
@@ -16,35 +16,35 @@ struct ChaseStep
 class Monster : public Entity
 {
 private:
-	// ¸ó½ºÅÍÀÇ Position
+	// ëª¬ìŠ¤í„°ì˜ Position
 	Position _position{};
-	// ¸ó½ºÅÍÀÎÁö º¸½ºÀÎÁö ÆÇ´Ü, º¸½º¶ó¸é B·Î Ç¥½Ã
+	// ëª¬ìŠ¤í„°ì¸ì§€ ë³´ìŠ¤ì¸ì§€ íŒë‹¨, ë³´ìŠ¤ë¼ë©´ Bë¡œ í‘œì‹œ
 	bool _isBoss = false;
 
 public:
-	// ±âº» »ı¼ºÀÚ
+	// ê¸°ë³¸ ìƒì„±ì
 	Monster(std::string name, int health, int attack, int defense, bool isBoss = false)
 		: Entity(name, health, attack, defense), _isBoss(isBoss)
 	{
 
 	}
 
-	// ±âº» ¼Ò¸êÀÚ
+	// ê¸°ë³¸ ì†Œë©¸ì
 	~Monster() override = default;
 
 public:
-	// À§Ä¡ ±âº» Getter/Setter
+	// ìœ„ì¹˜ ê¸°ë³¸ Getter/Setter
 	const Position& GetPosition() const { return _position; }
 	void SetPosition(int x, int y) { _position = { x,y }; }
 
-	// º¸½º ÀÎÁö È®ÀÎÇÏ´Â Getter
+	// ë³´ìŠ¤ ì¸ì§€ í™•ì¸í•˜ëŠ” Getter
 	bool IsBoss() const { return _isBoss; }
 
 public:
-	// ¸ó½ºÅÍ ±æÃ£±â ¾Ë°í¸®Áò
+	// ëª¬ìŠ¤í„° ê¸¸ì°¾ê¸° ì•Œê³ ë¦¬ì¦˜
 	ChaseStep CalcChaseStep(Position playerPos) const;
 
-	// ¸ó½ºÅÍ ±âº» ¿òÁ÷ÀÓ
+	// ëª¬ìŠ¤í„° ê¸°ë³¸ ì›€ì§ì„
 	void ApplyMove(int stepX, int stepY);
 
 };

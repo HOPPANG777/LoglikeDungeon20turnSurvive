@@ -1,4 +1,4 @@
-#pragma once
+О╩©#pragma once
 
 #include <iostream>
 #include <string>
@@ -10,8 +10,8 @@ enum class Action
 	ACTION_MOVE_DOWN,
 	ACTION_MOVE_LEFT,
 	ACTION_MOVE_RIGHT,
-	ACTION_INTERACT,	// E: ╬фюлеш ащ╠Б / фВ╪г ╩Г©К
-	ACTION_USE_POTION,	// H: фВ╪г ╩Г©К
+	ACTION_INTERACT,	// E: Л∙└Л²╢М┘° Л╓█Й╦╟ / М▐╛Л┘≤ Л┌╛Л ╘
+	ACTION_USE_POTION,	// H: М▐╛Л┘≤ Л┌╛Л ╘
 	ACTION_QUIT
 };
 

@@ -1,15 +1,15 @@
-#pragma once
+ï»¿#pragma once
 #include <random>
 
 class Random
 {
 public:
-    // ¾îµð¼­µç È£Ãâ °¡´É
+    // ì–´ë””ì„œë“  í˜¸ì¶œ ê°€ëŠ¥
     static int Range(int p_Min, int p_Max);
     static float Range(float p_Min, float p_Max);
 
 private:
-    // °øÀ¯ÇØ¼­ »ç¿ëÇÒ ³­¼ö ¿£Áø
+    // ê³µìœ í•´ì„œ ì‚¬ìš©í•  ë‚œìˆ˜ ì—”ì§„
     static std::mt19937 s_Gen;
     static std::random_device s_Rd;
 };

@@ -1,12 +1,12 @@
-#include "Random.h"
+ï»¿#include "Random.h"
 
-// static ¸â¹ö º¯¼ö ÃÊ±âÈ­
+// static ë©¤ë²„ ë³€ìˆ˜ ì´ˆê¸°í™”
 std::random_device Random::s_Rd;
 std::mt19937 Random::s_Gen(Random::s_Rd());
 
 int Random::Range(int p_Min, int p_Max)
 {
-    // uniform_int_distributionÀº ÃÖ¼Ò, ÃÖ´ë ¹üÀ§¸¦ Æ÷ÇÔÇÕ´Ï´Ù.
+    // uniform_int_distributionì€ ìµœì†Œ, ìµœëŒ€ ë²”ìœ„ë¥¼ í¬í•¨í•©ë‹ˆë‹¤.
     std::uniform_int_distribution<int> dist(p_Min, p_Max);
     return dist(s_Gen);
 }

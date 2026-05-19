@@ -1,9 +1,9 @@
-#pragma once
+О╩©#pragma once
 
 enum class Tile
 {
 	TILE_NONE = 0,
-	TILE_EMPTY, // ╨Сд╜
-	TILE_WALL,  // ╨╝
-	TILE_ITEM   // ╬фюлеш
+	TILE_EMPTY, // К╧┬Л╧╦
+	TILE_WALL,  // К╡╫
+	TILE_ITEM   // Л∙└Л²╢М┘°
 };

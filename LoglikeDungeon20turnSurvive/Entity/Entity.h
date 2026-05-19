@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include <vector>
@@ -7,29 +7,29 @@
 class Entity
 {
 protected:
-	// ¿£Æ¼Æ¼ ÀÌ¸§
+	// ì—”í‹°í‹° ì´ë¦„
 	std::string _name = {};
 
-	// Á×¾ú´ÂÁö ÆÇ´Ü
+	// ì£½ì—ˆëŠ”ì§€ íŒë‹¨
 	bool _isDead = false;
 
-	// Ã¼·Â
+	// ì²´ë ¥
 	int _maxHealth = 0;
 	int _currentHealth = 0;
 
-	// ±âº» ½ºÅÈ
+	// ê¸°ë³¸ ìŠ¤íƒ¯
 	int _attack = 0;
 	int _defense = 0;
 
 public:
-	// ±âº» »ı¼ºÀÚ
+	// ê¸°ë³¸ ìƒì„±ì
 	Entity(const std::string& name);
 	
-	// »ı¼ºÀÚ 
+	// ìƒì„±ì 
 	Entity(const std::string& name, int health, int attack, int defense);
 	
 public:
-	// º¹»ç »ı¼ºÀÚ
+	// ë³µì‚¬ ìƒì„±ì
 	Entity(const Entity& other)
 		: Entity(other._name, other._maxHealth, other._attack, other._defense)
 	{
@@ -52,7 +52,7 @@ public:
 	}
 
 public:
-	// ±âº» ¼Ò¸êÀÚ
+	// ê¸°ë³¸ ì†Œë©¸ì
 	virtual ~Entity() = default;
 
 public:
@@ -60,16 +60,16 @@ public:
 	virtual void Render(); 
 
 public:
-	// µ¥¹ÌÁö¸¦ ¹Ş´Â ÇÔ¼ö
+	// ë°ë¯¸ì§€ë¥¼ ë°›ëŠ” í•¨ìˆ˜
 	void TakeDamage(int damage);
 
-	// °ø°İ ÇÏ´Â ÇÔ¼ö
+	// ê³µê²© í•˜ëŠ” í•¨ìˆ˜
 	void Attack(Entity& defender);
 
-	// »ó´ë¹æ °ø°İÀ¸·Î ÀüÈ¯
+	// ìƒëŒ€ë°© ê³µê²©ìœ¼ë¡œ ì „í™˜
 	bool ExchangeCombat(Entity& other);
 
-	// »ç¸Á ÇÔ¼ö
+	// ì‚¬ë§ í•¨ìˆ˜
 	virtual void Dead();
 
 public:

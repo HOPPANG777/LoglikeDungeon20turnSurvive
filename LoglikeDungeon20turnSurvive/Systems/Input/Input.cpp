@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include "Input.h"
 
 using namespace std;
@@ -8,7 +8,7 @@ Action Input::ReadInput()
 	string input;
 	getline(cin, input);
 
-	// ºó ÀÔ·ÂÀº None Ã³¸®
+	// ë¹ˆ ìž…ë ¥ì€ None ì²˜ë¦¬
 	if (input.empty()) return Action::ACTION_NONE;
 
 	unsigned char c = tolower(input[0]);
@@ -23,7 +23,7 @@ Action Input::ReadInput()
 	case 'h': return Action::ACTION_USE_POTION;
 	case 'q': return Action::ACTION_QUIT;
 	default:
-		// ESC ÀÔ·Â ½Ã Á¾·á
+		// ESC ìž…ë ¥ ì‹œ ì¢…ë£Œ
 		if (input.size() >= 1 && static_cast<unsigned char>(input[0]) == 27)
 			return Action::ACTION_QUIT;
 		return Action::ACTION_NONE;

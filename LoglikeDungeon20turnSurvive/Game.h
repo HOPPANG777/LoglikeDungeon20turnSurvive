@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include <string>
@@ -17,7 +17,7 @@
 class Game
 {
 private:
-	// 20ÅÏ Á¦ÇÑ
+	// 20í„´ ì œí•œ
 	static constexpr int kSurvivalTurns = 20;
 
 	Map _map;

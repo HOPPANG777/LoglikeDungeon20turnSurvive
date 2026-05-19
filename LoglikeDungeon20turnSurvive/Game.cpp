@@ -1,4 +1,4 @@
-
+ï»¿
 #include "Game.h"
 #include <algorithm>
 #include <cmath>
@@ -14,10 +14,10 @@ void Game::Init()
 {
 	_map.MapInit();
 
-	// ÇÃ·¹ÀÌ¾î ½ÃÀÛ À§Ä¡ -> º®ÀÌ ¾Æ´Ñ °÷
+	// í”Œë ˆì´ì–´ ì‹œì‘ ìœ„ì¹˜ -> ë²½ì´ ì•„ë‹Œ ê³³
 	_player.SetPosition(1, 1);
 
-	// °ÔÀÓ »óÅÂ ÃÊ±âÈ­
+	// ê²Œì„ ìƒíƒœ ì´ˆê¸°í™”
 	_monsters.clear();
 	_monsterPosition.clear();
 	_items.clear();
@@ -28,10 +28,10 @@ void Game::Init()
 	_running = true;
 	_endMessage.clear();
 
-	// ¸ó½ºÅÍ ½ÃÀÛ À§Ä¡ -> º®ÀÌ ¾Æ´Ñ °÷
+	// ëª¬ìŠ¤í„° ì‹œì‘ ìœ„ì¹˜ -> ë²½ì´ ì•„ë‹Œ ê³³
 	MonsterSpawn(3);
 
-	// ¾ÆÀÌÅÛ 3°³ ¹èÄ¡
+	// ì•„ì´í…œ 3ê°œ ë°°ì¹˜
 	ItemSpawn(3);
 
 	_log.clear();
@@ -42,19 +42,19 @@ void Game::Init()
 
 void Game::Run()
 {
-	// Ãâ·Â ¡æ ÀÔ·Â ¡æ ¸ó½ºÅÍ ¡æ ÅÏ Áõ°¡ ¡æ ½ÂÆĞ
+	// ì¶œë ¥ â†’ ì…ë ¥ â†’ ëª¬ìŠ¤í„° â†’ í„´ ì¦ê°€ â†’ ìŠ¹íŒ¨
 	while (_running && _state == GameState::GAME_STATE_PLAYING)
 	{
-		// ¸Ê + »óÅÂ Ãâ·Â
+		// ë§µ + ìƒíƒœ ì¶œë ¥
 		Render();
 
 		cout << "\n> ";
 		cout.flush();
 
-		// ÇÃ·¹ÀÌ¾î ÀÔ·Â Ã³¸®
+		// í”Œë ˆì´ì–´ ì…ë ¥ ì²˜ë¦¬
 		Action a = _input.ReadInput();
 
-		// Á¾·á´Â ÅÏÀ» ¼Ò¸ğÇÏÁö ¾ÊÀ½
+		// ì¢…ë£ŒëŠ” í„´ì„ ì†Œëª¨í•˜ì§€ ì•ŠìŒ
 		if (a == Action::ACTION_QUIT)
 		{
 			_running = false;
@@ -64,18 +64,18 @@ void Game::Run()
 
 		HandlePlayerAction(a);
 
-		// º¸½º Ã³Ä¡ µîÀ¸·Î ÀÌ¹Ì ½Â¸®ÇÑ °æ¿ì
+		// ë³´ìŠ¤ ì²˜ì¹˜ ë“±ìœ¼ë¡œ ì´ë¯¸ ìŠ¹ë¦¬í•œ ê²½ìš°
 		if (_state != GameState::GAME_STATE_PLAYING)
 			break;
 
-		// ÇÃ·¹ÀÌ¾î »ç¸Á ½Ã ÆĞ¹è
+		// í”Œë ˆì´ì–´ ì‚¬ë§ ì‹œ íŒ¨ë°°
 		if (_player.IsDead())
 		{
 			SetDefeat();
 			break;
 		}
 
-		// ¸ó½ºÅÍ ÀÌµ¿ + Á¢ÃË ÀüÅõ
+		// ëª¬ìŠ¤í„° ì´ë™ + ì ‘ì´‰ ì „íˆ¬
 		UpdateMonsters();
 		RemoveDeadMonsters();
 
@@ -85,15 +85,15 @@ void Game::Run()
 			break;
 		}
 
-		// ÅÏ Áõ°¡, 20ÅÏ º¸½º µîÀå
+		// í„´ ì¦ê°€, 20í„´ ë³´ìŠ¤ ë“±ì¥
 		EndTurn();
 
-		// ½ÂÆĞ ÆÇÁ¤
+		// ìŠ¹íŒ¨ íŒì •
 		if (CheckEndCondition())
 			break;
 	}
 
-	// Á¾·á È­¸é
+	// ì¢…ë£Œ í™”ë©´
 	if (_state == GameState::GAME_STATE_WON || _state == GameState::GAME_STATE_LOST)
 	{
 		RenderEndScreen();
@@ -112,7 +112,7 @@ void Game::HandlePlayerAction(Action a)
 	case Action::ACTION_MOVE_RIGHT: TryMovePlayer(1, 0); break;
 
 	case Action::ACTION_INTERACT:
-		// E -> °°Àº Ä­ ¾ÆÀÌÅÛ Áİ±â, ¾øÀ¸¸é Æ÷¼Ç »ç¿ë
+		// E -> ê°™ì€ ì¹¸ ì•„ì´í…œ ì¤ê¸°, ì—†ìœ¼ë©´ í¬ì…˜ ì‚¬ìš©
 		if (!TryPickupItem())
 			TryUsePotion();
 		break;
@@ -123,7 +123,7 @@ void Game::HandlePlayerAction(Action a)
 
 	case Action::ACTION_NONE:
 	default:
-		AddLog("Àß¸øµÈ ÀÔ·ÂÀÔ´Ï´Ù.");
+		AddLog("ì˜ëª»ëœ ì…ë ¥ì…ë‹ˆë‹¤.");
 		break;
 	}
 }
@@ -133,7 +133,7 @@ void Game::TryMovePlayer(int dx, int dy)
 	Position cur = _player.GetPosition();
 	Position next{ cur.x + dx, cur.y + dy };
 
-	// ÀÌµ¿ÇÏ·Á´Â Ä­¿¡ ¸ó½ºÅÍ°¡ ÀÖÀ¸¸é ÀüÅõ (Game ÆÇÁ¤)
+	// ì´ë™í•˜ë ¤ëŠ” ì¹¸ì— ëª¬ìŠ¤í„°ê°€ ìˆìœ¼ë©´ ì „íˆ¬ (Game íŒì •)
 	int idx = FindMonsterIndexAt(next);
 
 	if (idx != -1)
@@ -169,18 +169,18 @@ void Game::TryMovePlayer(int dx, int dy)
 void Game::PerformExchangeCombat(Entity& attacker, Entity& defender)
 {
 	attacker.Attack(defender);
-	AddLog(defender.GetName() + "°¡ " + to_string(attacker.GetATK()) + "¸¸Å­ µ¥¹ÌÁö¸¦ ÀÔ¾ú½À´Ï´Ù.");
+	AddLog(defender.GetName() + "ê°€ " + to_string(attacker.GetATK()) + "ë§Œí¼ ë°ë¯¸ì§€ë¥¼ ì…ì—ˆìŠµë‹ˆë‹¤.");
 
 	if (!defender.IsDead())
 	{
 		defender.Attack(attacker);
-		AddLog(attacker.GetName() + "°¡ " + to_string(defender.GetATK()) + "¸¸Å­ µ¥¹ÌÁö¸¦ ÀÔ¾ú½À´Ï´Ù.");
+		AddLog(attacker.GetName() + "ê°€ " + to_string(defender.GetATK()) + "ë§Œí¼ ë°ë¯¸ì§€ë¥¼ ì…ì—ˆìŠµë‹ˆë‹¤.");
 	}
 }
 
 void Game::CombatWithMonster(int monsterIndex)
 {
-	// ÇÑ ÅÏ¿¡ 1È¸ ±³È¯ -> µÑ Áß ÇÏ³ª°¡ Á×À» ¶§±îÁö ¹İº¹
+	// í•œ í„´ì— 1íšŒ êµí™˜ -> ë‘˜ ì¤‘ í•˜ë‚˜ê°€ ì£½ì„ ë•Œê¹Œì§€ ë°˜ë³µ
 	while (!_player.IsDead() && monsterIndex < static_cast<int>(_monsters.size())
 		&& !_monsters[monsterIndex].IsDead())
 	{
@@ -193,7 +193,7 @@ void Game::OnMonsterKilled(int monsterIndex)
 	if (monsterIndex < 0 || monsterIndex >= static_cast<int>(_monsters.size()))
 		return;
 
-	AddLog(_monsters[monsterIndex].GetName() + "°¡ »ç¸ÁÇß½À´Ï´Ù.");
+	AddLog(_monsters[monsterIndex].GetName() + "ê°€ ì‚¬ë§í–ˆìŠµë‹ˆë‹¤.");
 
 	Position deadPos = _monsters[monsterIndex].GetPosition();
 
@@ -221,7 +221,7 @@ void Game::UpdateMonsters()
 
 		if (mPos == pPos)
 		{
-			AddLog(_monsters[i].GetName() + "ÀÇ °ø°İ!");
+			AddLog(_monsters[i].GetName() + "ì˜ ê³µê²©!");
 			CombatWithMonster(static_cast<int>(i));
 		}
 	}
@@ -336,11 +336,11 @@ void Game::SpawnBoss()
 		_monsters.push_back(boss);
 		_monsterPosition.insert(pos);
 		_bossSpawned = true;
-		AddLog("º¸½º°¡ µîÀåÇß½À´Ï´Ù!");
+		AddLog("ë³´ìŠ¤ê°€ ë“±ì¥í–ˆìŠµë‹ˆë‹¤!");
 		return;
 	}
 
-	AddLog("º¸½º ½ºÆù ½ÇÆĞ (ºó Ä­ ¾øÀ½).");
+	AddLog("ë³´ìŠ¤ ìŠ¤í° ì‹¤íŒ¨ (ë¹ˆ ì¹¸ ì—†ìŒ).");
 }
 
 void Game::ItemSpawn(int count)
@@ -384,7 +384,7 @@ bool Game::TryPickupItem()
 
 	if (!HasItemAt(p))
 	{
-		AddLog("ÁİÀ» ¾ÆÀÌÅÛÀÌ ¾ø½À´Ï´Ù.");
+		AddLog("ì¤ì„ ì•„ì´í…œì´ ì—†ìŠµë‹ˆë‹¤.");
 		return false;
 	}
 
@@ -392,18 +392,18 @@ bool Game::TryPickupItem()
 		return false;
 
 	_items.erase(remove(_items.begin(), _items.end(), p), _items.end());
-	AddLog("Æ÷¼ÇÀ» È¹µæÇß½À´Ï´Ù.");
+	AddLog("í¬ì…˜ì„ íšë“í–ˆìŠµë‹ˆë‹¤.");
 	return true;
 }
 
 void Game::TryUsePotion()
 {
 	if (_player.TryUsePotion())
-		AddLog("Æ÷¼ÇÀ» »ç¿ëÇß½À´Ï´Ù. HP È¸º¹.");
+		AddLog("í¬ì…˜ì„ ì‚¬ìš©í–ˆìŠµë‹ˆë‹¤. HP íšŒë³µ.");
 	else if (_player.GetPotionCount() <= 0)
-		AddLog("Æ÷¼ÇÀÌ ¾ø½À´Ï´Ù.");
+		AddLog("í¬ì…˜ì´ ì—†ìŠµë‹ˆë‹¤.");
 	else
-		AddLog("ÇöÀç Ã¼·ÂÀÌ ÃÖ´ë Ã¼·Â°ú µ¿ÀÏÇÕ´Ï´Ù.");
+		AddLog("í˜„ì¬ ì²´ë ¥ì´ ìµœëŒ€ ì²´ë ¥ê³¼ ë™ì¼í•©ë‹ˆë‹¤.");
 }
 
 bool Game::CheckEndCondition()
@@ -433,9 +433,9 @@ void Game::SetVictory(bool byBoss)
 	_running = false;
 
 	if (byBoss)
-		_endMessage = "½Â¸®! º¸½º¸¦ Ã³Ä¡Çß½À´Ï´Ù.";
+		_endMessage = "ìŠ¹ë¦¬! ë³´ìŠ¤ë¥¼ ì²˜ì¹˜í–ˆìŠµë‹ˆë‹¤.";
 	else
-		_endMessage = "½Â¸®! 20ÅÏÀ» »ıÁ¸Çß½À´Ï´Ù.";
+		_endMessage = "ìŠ¹ë¦¬! 20í„´ì„ ìƒì¡´í–ˆìŠµë‹ˆë‹¤.";
 
 	AddLog(_endMessage);
 }
@@ -444,7 +444,7 @@ void Game::SetDefeat()
 {
 	_state = GameState::GAME_STATE_LOST;
 	_running = false;
-	_endMessage = "ÆĞ¹è! HP°¡ 0ÀÌ µÇ¾ú½À´Ï´Ù.";
+	_endMessage = "íŒ¨ë°°! HPê°€ 0ì´ ë˜ì—ˆìŠµë‹ˆë‹¤.";
 	AddLog(_endMessage);
 }
 
@@ -569,14 +569,14 @@ void Game::RenderEndScreen() const
 	ClearScreen();
 	cout << "\n========================================\n";
 	if (_state == GameState::GAME_STATE_WON)
-		cout << "  ½Â¸®\n";
+		cout << "  ìŠ¹ë¦¬\n";
 	else
-		cout << "  ÆĞ¹è\n";
+		cout << "  íŒ¨ë°°\n";
 	cout << "========================================\n\n";
 	cout << _endMessage << "\n\n";
-	cout << "ÃÖÁ¾ ÅÏ: " << _turn << "\n";
+	cout << "ìµœì¢… í„´: " << _turn << "\n";
 	cout << "HP: " << _player.GetHP() << "/" << _player.GetMaxHP() << "\n\n";
-	cout << "Enter Å°¸¦ ´©¸£¸é Á¾·áÇÕ´Ï´Ù...\n";
+	cout << "Enter í‚¤ë¥¼ ëˆ„ë¥´ë©´ ì¢…ë£Œí•©ë‹ˆë‹¤...\n";
 }
 
 void Game::AddLog(const string& msg)

@@ -1,4 +1,4 @@
-#include "Monster.h"
+ï»¿#include "Monster.h"
 #include <cmath>
 
 ChaseStep Monster::CalcChaseStep(Position playerPos) const
@@ -9,10 +9,10 @@ ChaseStep Monster::CalcChaseStep(Position playerPos) const
 	int dx = playerPos.x - cur.x;
 	int dy = playerPos.y - cur.y;
 
-	// ÀÌ¹Ì °°Àº Ä­ÀÌ¸é ÀÌµ¿ÇÏÁö ¾ÊÀ½
+	// ì´ë¯¸ ê°™ì€ ì¹¸ì´ë©´ ì´ë™í•˜ì§€ ì•ŠìŒ
 	if (dx == 0 && dy == 0) return result;
 
-	// x/y Â÷ÀÌ°¡ Å« ÃàÀ¸·Î 1Ä­ ÃßÀû (¸ÇÇØÆ°)
+	// x/y ì°¨ì´ê°€ í° ì¶•ìœ¼ë¡œ 1ì¹¸ ì¶”ì  (ë§¨í•´íŠ¼)
 	if (std::abs(dx) >= std::abs(dy))
 	{
 		result.stepX = (dx > 0) ? 1 : (dx < 0 ? -1 : 0);
