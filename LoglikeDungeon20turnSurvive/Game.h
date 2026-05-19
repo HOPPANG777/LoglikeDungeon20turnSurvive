@@ -1,91 +1,53 @@
 ﻿#pragma once
 
-#include <iostream>
 #include <string>
-#include <deque>
-#include <random>
-#include <set>
-#include <vector>
 #include "Systems/Map/Map.h"
 #include "Entity/Player/Player.h"
-#include "Entity/Enemy/Monster.h"
+#include "Entity/Enemy/Enemy.h"
+#include "Item/Item.h"
 #include "Systems/Input/Input.h"
-#include "Utilities/Random.h"
-#include "Type/Tile.h"
+#include "Systems/Log/Log.h"
+#include "Systems/Spawner/EntitySpawner.h"
+#include "Systems/Render/GameRenderer.h"
 #include "Type/GameState.h"
 
+// 게임 루프, 턴, 승패
 class Game
 {
 private:
-	// 20턴 제한
-	static constexpr int kSurvivalTurns = 20;
-
 	Map _map;
 	Player _player;
+	Enemy _enemies;
+	Item _items;
+	Log _log;
 	Input _input;
+	EntitySpawner _spawner;
+	GameRenderer _renderer;
 
 	int _turn = 1;
 	bool _running = true;
+	bool _bossSpawned = false;
+	bool _wonByBoss = false;
 	GameState _state = GameState::GAME_STATE_PLAYING;
 	std::string _endMessage;
 
-	std::deque<std::string> _log;
-
-	std::vector<Monster> _monsters;
-	std::set<Position> _monsterPosition;
-	std::vector<Position> _items;
-
-	bool _bossSpawned = false;
-	bool _wonByBoss = false;
-
 public:
 	Game();
+	~Game() = default;
 
 public:
 	void Init();
 	void Run();
 
-	void AddLog(const std::string& msg);
-
 private:
-	void Render() const;
-	void PlayerStatRender() const;
-	void RenderEndScreen() const;
-
-	void HandlePlayerAction(Action a);
+	void HandlePlayerAction(Action action);
 	void TryMovePlayer(int dx, int dy);
-
-	void UpdateMonsters();
-	void TryMoveMonster(Monster& monster);
-	void RemoveDeadMonsters();
-	void SyncMonsterPositions();
-
-	void SpawnBoss();
-	void ItemSpawn(int count);
-	bool HasItemAt(Position pos) const;
-	void RemoveItemAt(Position pos);
-	bool TryPickupItem();
 	void TryUsePotion();
 
+private:
 	void EndTurn();
 	bool CheckEndCondition();
 	void SetVictory(bool byBoss);
 	void SetDefeat();
 
-	void PerformExchangeCombat(Entity& attacker, Entity& defender);
-	void CombatWithMonster(int monsterIndex);
-	void OnMonsterKilled(int monsterIndex);
-
-public:
-	void MonsterSpawn(const int count);
-	Monster* FindMonsterAt(int x, int y);
-	int FindMonsterIndexAt(Position pos);
-
-	bool IsOccupiedByMonster(Position pos, int skipIndex = -1) const;
-
-private:
-	static void ClearScreen();
-	static char TileToChar(Tile t);
-
 };
-

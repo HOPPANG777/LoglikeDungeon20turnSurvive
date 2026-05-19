@@ -18,6 +18,21 @@
     <ClCompile Include="Entity\Enemy\Monster.cpp">
       <Filter>Entity\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Entity\Enemy\Enemy.cpp">
+      <Filter>Entity\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\Combat\Combat.cpp">
+      <Filter>Systems\Combat</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\Log\Log.cpp">
+      <Filter>Systems\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\Render\GameRenderer.cpp">
+      <Filter>Systems\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\Spawner\EntitySpawner.cpp">
+      <Filter>Systems\Spawner</Filter>
+    </ClCompile>
     <ClCompile Include="Utilities\Random.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -46,6 +61,18 @@
     </Filter>
     <Filter Include="Systems\Map">
       <UniqueIdentifier>{8abd3cfe-743d-4488-8e77-76110f11c32b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Log">
+      <UniqueIdentifier>{a1b2c3d4-e5f6-7890-abcd-ef1234567890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Combat">
+      <UniqueIdentifier>{b2c3d4e5-f6a7-8901-bcde-f12345678901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Render">
+      <UniqueIdentifier>{c3d4e5f6-a7b8-9012-cdef-123456789012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Spawner">
+      <UniqueIdentifier>{d4e5f6a7-b8c9-0123-def0-234567890123}</UniqueIdentifier>
     </Filter>
     <Filter Include="Entity\Boss">
       <UniqueIdentifier>{7380c0c1-04ee-44d5-8ae4-ac1ff4b60b24}</UniqueIdentifier>
@@ -85,6 +112,21 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Entity\Enemy\Monster.h">
       <Filter>Entity\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Enemy\Enemy.h">
+      <Filter>Entity\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Combat\Combat.h">
+      <Filter>Systems\Combat</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Log\Log.h">
+      <Filter>Systems\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Render\GameRenderer.h">
+      <Filter>Systems\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Spawner\EntitySpawner.h">
+      <Filter>Systems\Spawner</Filter>
     </ClInclude>
     <ClInclude Include="Utilities\Random.h">
       <Filter>Utilities</Filter>

@@ -161,9 +161,14 @@
   <ItemGroup>
     <ClCompile Include="Entity\Boss\Boss.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
+    <ClCompile Include="Entity\Enemy\Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Entity\Enemy\Monster.cpp" />
     <ClCompile Include="Item\Item.cpp" />
+    <ClCompile Include="Systems\Combat\Combat.cpp" />
+    <ClCompile Include="Systems\Log\Log.cpp" />
+    <ClCompile Include="Systems\Render\GameRenderer.cpp" />
+    <ClCompile Include="Systems\Spawner\EntitySpawner.cpp" />
     <ClCompile Include="Utilities\Random.cpp" />
     <ClCompile Include="Systems\Input\Input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -173,8 +178,13 @@
   <ItemGroup>
     <ClInclude Include="Entity\Boss\Boss.h" />
     <ClInclude Include="Entity\Entity.h" />
+    <ClInclude Include="Entity\Enemy\Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Entity\Enemy\Monster.h" />
+    <ClInclude Include="Systems\Combat\Combat.h" />
+    <ClInclude Include="Systems\Log\Log.h" />
+    <ClInclude Include="Systems\Render\GameRenderer.h" />
+    <ClInclude Include="Systems\Spawner\EntitySpawner.h" />
     <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Utilities\Random.h" />
     <ClInclude Include="Systems\Input\Input.h" />
